@@ -13,5 +13,7 @@ frontend/dist/
 frontend/.vite/
 data/outputs/*
 !data/outputs/.gitkeep
+data/inputs/*
+!data/inputs/.gitkeep
 /models/
 *.log

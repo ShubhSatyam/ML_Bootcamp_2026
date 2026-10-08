@@ -19,7 +19,7 @@ const tabs = [
 type TabId = (typeof tabs)[number]["id"];
 
 export default function ResultsPage({ meeting, onNewMeeting }: Props) {
-  const [selected, setSelected] = useState<TabId>("summary");
+  const [selected, setSelected] = useState<TabId>("raw");
   const [compare, setCompare] = useState(false);
   return (
     <main className="results-shell">
@@ -39,10 +39,17 @@ export default function ResultsPage({ meeting, onNewMeeting }: Props) {
         </div>
       </div>
       <div className="results-layout">
-        <nav className="results-nav" aria-label="Meeting results">
+        <nav className="results-nav" aria-label="Meeting results" role="tablist">
           <span className="nav-caption">MEETING RECORD</span>
           {tabs.map(({ id, label, icon: Icon }) => (
-            <button key={id} className={`result-tab ${selected === id ? "selected" : ""}`} onClick={() => setSelected(id)}>
+            <button
+              key={id}
+              className={`result-tab ${selected === id ? "selected" : ""}`}
+              onClick={() => setSelected(id)}
+              role="tab"
+              aria-selected={selected === id}
+              aria-controls="meeting-result-panel"
+            >
               <Icon size={17} strokeWidth={1.8} /><span>{label}</span>{selected === id && <span className="tab-indicator" />}
             </button>
           ))}
@@ -52,7 +59,7 @@ export default function ResultsPage({ meeting, onNewMeeting }: Props) {
             <a href={downloadUrl(meeting.id, "refined-transcript")}><ArrowDownToLine size={14} /> Refined transcript</a>
           </div>
         </nav>
-        <section className="result-content">
+        <section className="result-content" id="meeting-result-panel" role="tabpanel">
           <div className="content-heading">
             <div>
               <span className="content-kicker">{tabs.find((tab) => tab.id === selected)?.label.toUpperCase()}</span>

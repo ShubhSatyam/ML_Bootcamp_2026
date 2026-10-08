@@ -1,7 +1,9 @@
 from datetime import datetime, timezone
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from typing import Annotated
+
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, field_validator
 
 
 class MeetingStatus(str, Enum):
@@ -11,10 +13,23 @@ class MeetingStatus(str, Enum):
     failed = "failed"
 
 
-class Task(BaseModel):
+Minute = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
+
+
+class MeetingMinutes(BaseModel):
+    """Validated, ordered discussion points for one meeting."""
+
     model_config = ConfigDict(extra="forbid")
 
-    task: str = Field(min_length=1)
+    entries: list[Minute] = Field(default_factory=list)
+
+
+class ActionItem(BaseModel):
+    """An explicitly stated follow-up, with no inferred metadata."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    task: Minute
     owner: str = "Unspecified"
     deadline: str = "Unspecified"
 
@@ -24,20 +39,29 @@ class Task(BaseModel):
         return value.strip() if isinstance(value, str) and value.strip() else "Unspecified"
 
 
+# Retained as a public alias because the API and frontend expose `tasks`.
+Task = ActionItem
+
+
 class Decision(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    decision: str = Field(min_length=1)
-    evidence: str = Field(min_length=1)
+    decision: Minute
+    evidence: Minute
 
 
 class MeetingDocumentation(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    summary: str
-    minutes: list[str]
+    summary: Minute
+    minutes: list[Minute] = Field(default_factory=list)
     decisions: list[Decision]
-    tasks: list[Task]
+    tasks: list[ActionItem]
+
+    @field_validator("minutes")
+    @classmethod
+    def validate_minutes(cls, value: list[Minute]) -> list[Minute]:
+        return MeetingMinutes(entries=value).entries
 
 
 class Meeting(BaseModel):
@@ -48,9 +72,9 @@ class Meeting(BaseModel):
     raw_transcript: str | None = None
     refined_transcript: str | None = None
     summary: str | None = None
-    minutes: list[str] = Field(default_factory=list)
+    minutes: list[Minute] = Field(default_factory=list)
     decisions: list[Decision] = Field(default_factory=list)
-    tasks: list[Task] = Field(default_factory=list)
+    tasks: list[ActionItem] = Field(default_factory=list)
     error: str | None = None
     current_stage: str | None = None
     progress: int = 0

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { getMeeting, getMeetingStatus, startProcessing, uploadAudio } from "../services/api";
+import { getMeeting, startProcessing, uploadAudio } from "../services/api";
 import type { Meeting } from "../types/meeting";
 
 export function useMeeting() {
@@ -44,15 +44,11 @@ export function useMeeting() {
     let timeout: number;
     const poll = async () => {
       try {
-        const status = await getMeetingStatus(meeting.id);
+        // Fetch the full record so finished stages become visible immediately.
+        const latest = await getMeeting(meeting.id);
         if (!active) return;
-        if (status.status === "completed" || status.status === "failed") {
-          setMeeting(await getMeeting(meeting.id));
-          return;
-        }
-        setMeeting((current) =>
-          current ? { ...current, progress: status.progress, current_stage: status.current_stage } : current,
-        );
+        setMeeting(latest);
+        if (latest.status !== "processing") return;
       } catch (reason) {
         if (active) setError(reason instanceof Error ? reason.message : "Could not refresh meeting status.");
       }

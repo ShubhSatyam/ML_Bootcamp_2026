@@ -11,7 +11,13 @@ export default function App() {
     <div className="app-shell">
       <header className="site-header"><Brand /><div className="header-note"><span /> Your thoughtful meeting companion</div></header>
       {meeting?.status === "processing" || meeting?.status === "failed" ? (
-        <ProcessingPage meeting={meeting} error={meetingState.error} busy={meetingState.busy} onRetry={meetingState.process} />
+        <ProcessingPage
+          meeting={meeting}
+          error={meetingState.error}
+          busy={meetingState.busy}
+          onRetry={meetingState.process}
+          onNewMeeting={meetingState.reset}
+        />
       ) : meeting?.status === "completed" ? (
         <ResultsPage meeting={meeting} onNewMeeting={meetingState.reset} />
       ) : (
