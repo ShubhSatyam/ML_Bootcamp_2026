@@ -85,7 +85,7 @@ button:focus-visible, a:focus-visible, [role="button"]:focus-visible { outline: 
 .page-footer i { padding: 0 4px; color: #bbc5b8; font-style: normal; }
 
 .processing-shell { flex: 1; min-height: 620px; display: grid; place-items: center; padding: 45px 0 70px; }
-.processing-card { width: min(100%, 540px); padding: 44px 46px; border: 1px solid #e9ece7; border-radius: 16px; background: white; box-shadow: 0 22px 55px rgba(34,53,37,.045); }
+.processing-card { width: min(100%, 1040px); padding: 40px clamp(24px, 5vw, 52px); border: 1px solid #e9ece7; border-radius: 16px; background: white; box-shadow: 0 22px 55px rgba(34,53,37,.045); }
 .processing-animation { width: 55px; height: 55px; margin: 0 auto 23px; display: grid; place-items: center; border-radius: 16px; color: white; background: #4d805b; animation: soft-pulse 2.2s infinite; }
 .centered-eyebrow { justify-content: center; margin-bottom: 14px; }
 .processing-card h1 { text-align: center; font-size: 28px; letter-spacing: -1px; }
@@ -107,6 +107,40 @@ button:focus-visible, a:focus-visible, [role="button"]:focus-visible { outline: 
 .failed-card { text-align: center; }
 .failure-icon { width: 48px; height: 48px; margin: 0 auto 22px; display: grid; place-items: center; border-radius: 50%; background: #fff2ef; color: #bd6257; }
 .failed-card .button-primary { margin: 8px auto 0; }
+.live-transcripts { margin-top: 27px; padding-top: 22px; border-top: 1px solid #edf0eb; text-align: left; }
+.live-transcripts-heading { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; color: #68836c; font-size: 9px; font-weight: 700; letter-spacing: .13em; }
+.transcripts-note { margin-left: auto; color: #929b92; font-size: 10px; font-weight: 400; letter-spacing: 0; }
+.live-transcript-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.live-transcript { min-width: 0; overflow: hidden; border: 1px solid #e5ece4; border-radius: 10px; background: #fbfdf9; }
+.transcript-panel-heading { min-height: 73px; padding: 14px 15px; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; border-bottom: 1px solid #edf1eb; }
+.transcript-panel-heading h2 { margin: 0; color: #344238; font: 650 14px "Manrope", sans-serif; letter-spacing: -.2px; }
+.transcript-panel-heading p { margin: 5px 0 0; color: #889188; font-size: 10px; line-height: 1.5; }
+.transcript-status { flex-shrink: 0; padding: 5px 7px; border-radius: 20px; background: #f1f2ef; color: #858d85; font-size: 7px; font-weight: 700; letter-spacing: .08em; }
+.transcript-status.is-available { background: #edf5ed; color: #587d5e; }
+.transcript-status.is-pending { background: #f6f5ed; color: #8a8057; }
+.transcript-panel-content { max-height: 360px; overflow: auto; padding: 15px; color: #4e5950; font-size: 11px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; scrollbar-color: #c8d5c8 transparent; scrollbar-width: thin; }
+.transcript-panel-content.is-empty { min-height: 130px; display: grid; place-items: center; color: #929a92; text-align: center; }
+.transcript-panel-footer { min-height: 43px; padding: 7px 12px; border-top: 1px solid #edf1eb; display: flex; justify-content: space-between; align-items: center; gap: 8px; color: #7d897e; font-size: 9px; }
+.copy-transcript-button { padding: 6px 8px; border: 1px solid #e4ebe2; border-radius: 6px; background: white; color: #5a765f; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 9px; white-space: nowrap; }
+.copy-transcript-button:hover:not(:disabled) { border-color: #b7ceb8; background: #f5f9f3; }
+.copy-transcript-button:disabled { color: #a6ada6; cursor: not-allowed; }
+.failed-card .live-transcripts { width: 100%; }
+.meeting-documentation { margin-top: 27px; padding-top: 22px; border-top: 1px solid #edf0eb; text-align: left; }
+.documentation-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.documentation-panel { min-width: 0; overflow: hidden; border: 1px solid #e5ece4; border-radius: 10px; background: #fbfdf9; }
+.summary-document { grid-column: 1 / -1; }
+.documentation-panel-content { max-height: 320px; overflow: auto; padding: 15px; color: #4e5950; font-size: 11px; line-height: 1.8; overflow-wrap: anywhere; scrollbar-color: #c8d5c8 transparent; scrollbar-width: thin; }
+.documentation-panel-content.is-empty { min-height: 100px; display: grid; place-items: center; }
+.documentation-summary { margin: 0; color: #465349; font: 500 13px/1.8 "Manrope", sans-serif; white-space: pre-wrap; }
+.documentation-empty { margin: 0; color: #929a92; text-align: center; }
+.live-minutes-list, .live-decisions-list { margin: 0; padding: 0; list-style: none; }
+.live-minutes-list { counter-reset: minutes; }
+.live-minutes-list li { position: relative; padding: 2px 0 2px 31px; color: #4e5950; }
+.live-minutes-list li + li, .live-decisions-list li + li { margin-top: 12px; padding-top: 12px; border-top: 1px solid #edf1eb; }
+.live-minutes-list li::before { counter-increment: minutes; content: counter(minutes, decimal-leading-zero); position: absolute; left: 0; top: 3px; color: #8ca08d; font-size: 9px; font-weight: 700; letter-spacing: .07em; }
+.live-decisions-list li strong { display: flex; align-items: flex-start; gap: 7px; color: #405744; font-size: 11px; font-weight: 600; line-height: 1.6; }
+.live-decisions-list li strong svg { flex-shrink: 0; margin-top: 2px; color: #66876a; }
+.live-decisions-list li p { margin: 7px 0 0 21px; padding-left: 10px; border-left: 2px solid #d5e2d3; color: #7c867d; font-size: 10px; line-height: 1.65; }
 
 .results-shell { max-width: 1100px; width: 100%; flex: 1; margin: 0 auto; padding: 26px 0 42px; }
 .results-topline { display: flex; align-items: center; justify-content: space-between; }
@@ -185,6 +219,9 @@ button:focus-visible, a:focus-visible, [role="button"]:focus-visible { outline: 
   .step { min-width: 99px; }
   .results-layout { grid-template-columns: 190px 1fr; }
   .result-content { padding: 24px 22px; }
+  .live-transcript-grid { grid-template-columns: 1fr; }
+  .documentation-grid { grid-template-columns: 1fr; }
+  .summary-document { grid-column: auto; }
 }
 @media (max-width: 700px) {
   .site-header { height: 70px; }
@@ -219,5 +256,6 @@ button:focus-visible, a:focus-visible, [role="button"]:focus-visible { outline: 
   .upload-card { padding: 22px 18px; }
   .processing-card { padding: 34px 22px; }
   .processing-card h1 { font-size: 25px; }
+  .transcripts-note { display: none; }
   .task-metadata { gap: 20px; }
 }

@@ -18,6 +18,13 @@ def test_upload_status_and_missing_meeting(tmp_path: Path):
             "/api/meetings/upload", files={"audio": ("meeting.wav", wav, "text/plain")})
         assert response.status_code == 201
         meeting_id = response.json()["id"]
+        assert repository.audio_path(meeting_id).is_file()
+        assert not (repository._meeting_directory(meeting_id) / "audio.wav").exists()
+        assert repository.backup_path(meeting_id, "raw_transcript").parent.is_dir()
+        assert repository.backup_path(meeting_id, "refined_transcript").parent.is_dir()
+        assert repository.backup_path(meeting_id, "summary").parent.is_dir()
+        assert repository.backup_path(meeting_id, "minutes").parent.is_dir()
+        assert repository.backup_path(meeting_id, "action_items").parent.is_dir()
         status_response = client.get(f"/api/meetings/{meeting_id}/status")
         assert status_response.status_code == 200
         assert status_response.json()["status"] == "uploaded"

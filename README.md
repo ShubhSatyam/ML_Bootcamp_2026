@@ -61,8 +61,12 @@ frontend/
   src/types/               API data types
   src/utils/               File validation and display helpers
 docs/                      Architecture, pipeline, and demo notes
-data/sample/                Optional local demo recordings
-data/outputs/               Runtime-only audio and meeting artifacts (gitignored)
+data/inputs/<meeting-id>/   Uploaded source audio, isolated per recording (gitignored)
+data/inputs/sample/         Local demo recordings
+data/outputs/<meeting-id>/  Pipeline state (gitignored)
+data/outputs/backups/<meeting-id>/
+                            Separate raw/refined transcripts, summary, minutes,
+                            decisions, action items, and Markdown/JSON records
 ```
 
 ## Setup

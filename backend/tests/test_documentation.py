@@ -98,3 +98,10 @@ def test_possible_task_request_is_not_a_confirmed_action():
         '{"summary":"Task delegation discussed","minutes":["We could ask Rahul to prepare the report."],"decisions":[],"tasks":[]}'
     )
     assert output.tasks == []
+
+
+def test_rejects_blank_summary_and_blank_minute_entries():
+    with pytest.raises(ValueError, match="schema"):
+        _parse_documentation(
+            '{"summary":" ","minutes":[""],"decisions":[],"tasks":[]}'
+        )

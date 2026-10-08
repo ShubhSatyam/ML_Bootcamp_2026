@@ -23,12 +23,14 @@ def run_pipeline(meeting_id: str, repository: MeetingRepository | None = None) -
         raw_transcript = transcribe_audio(repo.audio_path(meeting_id))
         meeting = meeting.model_copy(update={"raw_transcript": raw_transcript, "progress": 35})
         repo.save(meeting)
+        repo.save_raw_transcript(meeting)
 
         meeting = meeting.model_copy(update={"current_stage": "Transcript refinement", "progress": 45})
         repo.save(meeting)
         refined_transcript = refine_transcript(raw_transcript)
         meeting = meeting.model_copy(update={"refined_transcript": refined_transcript, "progress": 70})
         repo.save(meeting)
+        repo.save_refined_transcript(meeting)
 
         meeting = meeting.model_copy(update={"current_stage": "Meeting documentation", "progress": 75})
         repo.save(meeting)
@@ -45,10 +47,12 @@ def run_pipeline(meeting_id: str, repository: MeetingRepository | None = None) -
             }
         )
         repo.save(meeting)
+        repo.save_documentation_outputs(meeting)
         completed = meeting.model_copy(
             update={"status": MeetingStatus.completed, "current_stage": None, "progress": 100}
         )
         repo.save(completed)
+        repo.save_documentation_outputs(completed)
         logger.info("[PIPELINE] Meeting %s completed", meeting_id)
     except Exception as exc:
         logger.exception("[PIPELINE] Meeting %s failed", meeting_id)

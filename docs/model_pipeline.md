@@ -21,6 +21,10 @@ Configure the model using `STT_MODEL` (default `small`), `STT_DEVICE`, and `STT_
 
 Pydantic validates the structured result. JSON fences and trailing commas are handled with safe parsing. If parsing or schema validation fails, the service makes one correction-prompt retry with the transcript, then raises a controlled error if it remains invalid. Empty task owner/deadline fields are normalized to `Unspecified`; the model is explicitly prohibited from inferring them or turning proposals into decisions.
 
+## Persisted artifacts
+
+For every recording, the repository keeps pipeline state in `data/outputs/<meeting-uuid>/meeting.json` and stores durable user-facing artifacts separately in `data/outputs/backups/<meeting-uuid>/`. Raw and refined transcripts have different folders, while summary, minutes, decisions, action items, and the final Markdown/JSON records are each written as their corresponding stage succeeds. This makes each recording independently recoverable and prevents later uploads from overwriting earlier outputs.
+
 ## Configuration
 
 The backend reads `backend/.env` when present, and existing process environment values take precedence. `LLM_API_KEY` is used only for Gemini requests. Model IDs can be changed independently for Stages 2 and 3. Prompts are files, not inline Python strings.

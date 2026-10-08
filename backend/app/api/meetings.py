@@ -1,13 +1,14 @@
 import logging
 import uuid
 from pathlib import Path
+from shutil import rmtree
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, UploadFile, status
 from fastapi.responses import Response
 
 from app.models.meeting import Meeting, MeetingStatus
 from app.services.pipeline.pipeline_service import run_pipeline
-from app.services.storage.repository import MeetingRepository, sanitize_filename
+from app.services.storage.repository import MeetingRepository, render_meeting_record, sanitize_filename
 from app.utils.audio import save_upload
 
 logger = logging.getLogger(__name__)
@@ -25,18 +26,15 @@ async def upload_meeting(
 ) -> Meeting:
     filename = sanitize_filename(audio.filename)
     meeting = Meeting(id=str(uuid.uuid4()), filename=filename, status=MeetingStatus.uploaded)
-    directory = repository._meeting_directory(meeting.id)
-    directory.mkdir(parents=True, exist_ok=False)
-    destination = directory / f"audio{Path(filename).suffix.lower()}"
+    repository.create(meeting)
+    destination = repository.audio_path(meeting.id)
     try:
         await save_upload(audio, destination)
-        repository.save(meeting)
     except Exception:
         destination.unlink(missing_ok=True)
-        try:
-            directory.rmdir()
-        except OSError:
-            pass
+        rmtree(repository._meeting_directory(meeting.id), ignore_errors=True)
+        rmtree(repository.input_directory(meeting.id), ignore_errors=True)
+        rmtree(repository.backup_directory(meeting.id), ignore_errors=True)
         raise
     logger.info("[UPLOAD] Meeting %s uploaded", meeting.id)
     return meeting
@@ -102,7 +100,7 @@ def download_meeting(
     elif format == "refined-transcript":
         content, media_type, filename = meeting.refined_transcript, "text/plain; charset=utf-8", "refined-transcript.txt"
     elif format == "record":
-        content = _human_readable_record(meeting)
+        content = render_meeting_record(meeting)
         media_type, filename = "text/markdown; charset=utf-8", "meeting-record.md"
     elif format == "json":
         return Response(
@@ -116,21 +114,4 @@ def download_meeting(
         content=content or "",
         media_type=media_type,
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
-    )
-
-
-def _human_readable_record(meeting: Meeting) -> str:
-    decisions = "\n".join(
-        f"- {item.decision}\n  Evidence: {item.evidence}" for item in meeting.decisions
-    ) or "- None identified"
-    tasks = "\n".join(
-        f"- **Task:** {item.task}\n  **Owner:** {item.owner}\n  **Deadline:** {item.deadline}" for item in meeting.tasks
-    ) or "- None identified"
-    minutes = "\n".join(f"- {item}" for item in meeting.minutes) or "- None identified"
-    return (
-        f"# Meeting Record: {meeting.filename}\n\n"
-        f"## Meeting Summary\n{meeting.summary or ''}\n\n"
-        f"## Meeting Minutes\n{minutes}\n\n"
-        f"## Key Decisions\n{decisions}\n\n"
-        f"## Action Items\n{tasks}\n"
     )
