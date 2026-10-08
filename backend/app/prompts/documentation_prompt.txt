@@ -1,0 +1,8 @@
+Create a concise, fact-grounded meeting record using only the refined transcript below. Return valid JSON only, with exactly these top-level fields:
+{"summary":"string","minutes":["string"],"decisions":[{"decision":"string","evidence":"short exact or faithful supporting quote"}],"tasks":[{"task":"string","owner":"string","deadline":"string"}]}
+
+Only include decisions that were explicitly agreed to, approved, or finalized. Do not turn proposals, questions, hypotheticals, suggestions, possibilities, or discussion into decisions. Only include actions the speakers explicitly propose or commit to; do not invent tasks. Never invent owners, deadlines, decisions, or commitments. If the transcript does not explicitly state an owner or deadline, set the corresponding value to "Unspecified" rather than inferring it from common sense. Preserve uncertainty, negation, names, numeric values, and dates exactly as spoken. If no supported items exist, return empty arrays. Do not include markdown fences or extra fields.
+
+<refined_transcript>
+{transcript}
+</refined_transcript>

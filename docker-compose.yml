@@ -1,0 +1,27 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      STT_MODEL: ${STT_MODEL:-small}
+      STT_DEVICE: ${STT_DEVICE:-cpu}
+      STT_COMPUTE_TYPE: ${STT_COMPUTE_TYPE:-int8}
+      CT2_USE_CUDA: ${CT2_USE_CUDA:-0}
+      REFINEMENT_MODEL: ${REFINEMENT_MODEL:-gemini-3.8-flash}
+      DOCUMENTATION_MODEL: ${DOCUMENTATION_MODEL:-gemini-3.8-flash}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      MAX_FILE_SIZE_MB: ${MAX_FILE_SIZE_MB:-100}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+    volumes:
+      - ./data/outputs:/app/data/outputs
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000}
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
